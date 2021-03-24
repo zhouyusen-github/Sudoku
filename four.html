@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<title>数独游戏</title>
+<title>数独 Sudoku</title>
 
 <style type="text/css">
 /*1.格式，使用类选择器（对应class）*/
@@ -266,8 +266,9 @@
   <!--1.简单模式-->
   <div class="divgs" id="sigongge">
       <div style="text-align:center"><!--div居中-->
-        <p>简单模式</p>
+        <p>4 X 4</p>
         <p>规则：根据已给的数字，将所有空格填上数字，要求每行每列都要有1，2，3，4这4个数字</p>
+        <p>Rule: According to the given number, fill in all the blanks with numbers. Each row and column should have 1 to 4.</p>        
       </div>
     <form name="form1" id="form2"  method="post"> 
       <table border="1" class="tablegs"><!--使用表格达到理想的视觉效果，在表格中嵌套文本框以达到响应的效果-->
@@ -302,13 +303,13 @@
         </tr>
       </table>      
       <div style="text-align:center"><!--div居中-->
-        <input type="button" value="点击提交" onclick="panduan()" class="angs" ><!--绝对位置虽然会方便，但是手机上会出错-->
+        <input type="button" style="width:200px;height:50px" value="点击提交 Submit" onclick="panduan()" class="angs" ><!--绝对位置虽然会方便，但是手机上会出错-->
       </div>
       <div style="text-align:center">
-        <input type="button" value="显示答案" onclick="daan()" class="angs" >
+        <input type="button" style="width:200px;height:50px" value="显示答案 Answer" onclick="daan()" class="angs" >
       </div>
       <div style="text-align:center">
-        <input type="button" value="新的一题" onclick="xinti()" class="angs" >
+        <input type="button" style="width:200px;height:50px" value="新的一题 New Question" onclick="xinti()" class="angs" >
       </div>
     </form>
   </div>    

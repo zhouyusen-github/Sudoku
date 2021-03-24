@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<title>数独游戏</title>
+<title>数独 Sudoku</title>
 
 <style type="text/css">
 /*1.格式，使用类选择器（对应class）*/
@@ -343,8 +343,9 @@ input[name="c1"]
   <!--1.困难模式-->
   <div class="divgs" id="sigongge">
       <div style="text-align:center"><!--div居中-->
-        <p>困难模式</p>
+        <p>9 X 9</p>
         <p>规则：根据已给的数字，将所有空格填上数字，要求每行每列以及九个小九宫格内都要有1-9</p>
+        <p>Rule: According to the given number, fill in all the blanks with numbers. Each row and column should have 1 to 9.</p>
       </div>
     <form name="form1" id="form2"  method="post"> 
       <table border="1" class="tablegs"><!--使用表格达到理想的视觉效果，在表格中嵌套文本框以达到响应的效果-->
@@ -460,13 +461,13 @@ input[name="c1"]
         </tr>
       </table>      
       <div style="text-align:center"><!--div居中-->
-        <input type="button" value="点击提交" onclick="panduan2()" class="angs" ><!--绝对位置虽然会方便，但是手机上会出错-->
+        <input type="button" style="width:200px;height:50px" value="点击提交 Submit" onclick="panduan2()" class="angs" ><!--绝对位置虽然会方便，但是手机上会出错-->
       </div>
       <div style="text-align:center">
-        <input type="button" value="显示答案" onclick="daan2()" class="angs" >
+        <input type="button" style="width:200px;height:50px" value="显示答案 Answer" onclick="daan2()" class="angs" >
       </div>
       <div style="text-align:center">
-        <input type="button" value="新的一题" onclick="xinti2()" class="angs" >
+        <input type="button" style="width:200px;height:50px" value="新的一题 New Question" onclick="xinti2()" class="angs" >
       </div>
     </form>
   </div>    
