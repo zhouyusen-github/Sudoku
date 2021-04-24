@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<title>数独</title>
+
+<style type="text/css">
+/*1.格式，使用类选择器（对应class）*/
+/*1.1文本框格式*/
+.wbk{
+    width:50px; 
+    height:50px;
+    text-align:center;/*格式是把style="width:50px; height:50px;text-align:center"内的东西移出来*/
+}
+/*1.2div格式*/
+.divgs{
+    width:500px; 
+    height:600px;
+    background-color: rgba(0,0,0,0.1);/*前三位表示颜色，最后一位表示透明度*/
+    margin:0 auto;/*设置margin，第一个参数表示顶部的距离为0，而第二个auto表示的是自动,即自动根据网页来居中。*/   
+}
+/*1.3table格式*/
+.tablegs{
+    width:200px; 
+    height:200px;
+    background-color: rgba(0,255,0,0.1);/*前三位表示颜色，最后一位表示透明度*/
+    margin:0 auto;/*设置margin，第一个参数表示顶部的距离为0，而第二个auto表示的是自动,即自动根据网页来居中。*/   
+}
+/*1.3按钮格式*/
+.angs{
+    width:100px; 
+    height:50px;
+    background-color: rgba(0,0,255,0.1);/*前三位表示颜色，最后一位表示透明度*/
+    margin:220 auto;/*设置margin，第一个参数表示顶部的距离为0，而第二个auto表示的是自动,即自动根据网页来居中。*/   
+}
+
+</style>
+
+<!--js代码-->
+<script language="javascript">
+
+
+//1.弄乱数组函数
+  //1.1随机数生成：生成0-3范围内的整数
+    function suiji(){
+      var a=0;
+      a=parseInt(Math.random()*10000);
+      var b=0;
+      b=a%4;
+      return b;
+    }
+
+  //1.2纵向打乱
+    function zongmix(shuzu){
+      var sj=0;
+      sj=suiji();
+      var zhongzhuan=new Array();
+      zhongzhuan=shuzu[sj];
+      shuzu[sj]=shuzu[((sj+3)%4)];
+      shuzu[((sj+3)%4)]=zhongzhuan;
+    }
+
+
+  //1.3横向打乱
+    function hengmix(shuzu)
+    {
+      var sj=0;
+      sj=suiji();
+      var zz=0;
+      for (i=0;i<4;i++)
+      {     
+        zz=shuzu[i][sj];
+        shuzu[i][sj]=shuzu[i][((sj+1)%4)];
+        shuzu[i][((sj+1)%4)]=zz;
+      }
+    }
+  //1.4多次打乱
+    function hunhe(shuzu)
+    {
+      for (k=0;k<15;k++)//这里不能用i
+      {
+        zongmix(shuzu);
+        hengmix(shuzu);
+      }
+    }
+//2.答案数组生成
+  //2.1生成数独表原型数组
+    var shuzu = new Array();
+    shuzu[0] = new Array();
+    shuzu[0]=[1,2,3,4];
+    shuzu[1] = new Array();
+    shuzu[1]=[3,4,1,2];
+    shuzu[2] = new Array();
+    shuzu[2]=[2,1,4,3];
+    shuzu[3] = new Array();
+    shuzu[3]=[4,3,2,1];
+  //2.2原型数组打乱生成答案数组
+    hunhe(shuzu);
+//    document.write(shuzu[0]+'<br/>');
+//   document.write(shuzu[1]+'<br/>');
+//    document.write(shuzu[2]+'<br/>');
+//    document.write(shuzu[3]+'<br/>');
+
+//3.显示控制xk数组（用于控制哪些位置显示已知数）
+  //3.1生成原型控制数组（数字1的多少即可调节难度）
+    var xk = new Array();
+    xk[0] = new Array();
+    xk[0]=[1,0,0,1];
+    xk[1] = new Array();
+    xk[1]=[0,0,1,0];
+    xk[2] = new Array();
+    xk[2]=[0,1,0,0];
+    xk[3] = new Array();
+    xk[3]=[1,0,0,1];
+  //3.2打乱生成实际控制数组
+    hunhe(xk);
+//    document.write(xk[0]+'<br/>');
+//    document.write(xk[1]+'<br/>');
+//    document.write(xk[2]+'<br/>');
+//    document.write(xk[3]+'<br/>');
+
+
+
+//4.显示xs在网页中的已知数导入（原理：控制数组为1的点对应答案数组点的数据显示出来）
+  //4.1合成id号（字符串拼接函数）
+    function hcid(x, y) {
+      var idhao="txt"+x+y;
+
+      return idhao;
+    }
+
+  //4.2已知数导入以及对应文本框只读锁定
+    function xs()
+    {
+      window.onload=function()//onload可以使得js可以在网页打开时就将表格内含的值改变
+      {
+        for (i=0;i<4;i++)
+        { 
+          for (j=0;j<4;j++)
+          {
+            if (xk[i][j]==1)
+            {                
+              var str=hcid(i,j);
+              document.getElementById(str).value=shuzu[i][j];
+              document.getElementById(str).readOnly = true;//readOnly为true则这个文本框只读
+            }
+          } 
+        }      
+      };
+    }
+    xs();
+
+//5.提取数字正确判断分析（暂时先使用与标准答案是否相同的算法，因为数组小，到时候正式九宫格可能要用，数字不重复且范围内，且相加和为45）
+      //5.1文本框填入数字提取函数
+
+            function ds(shuzi){  
+                   //第一种方法  
+                   var temp=document.getElementById(shuzi).value;   //注意引号内的内容应该是文本框的id而不能是name  
+                   return temp;  
+                }
+      //5.2与正确答案比较函数
+      var zw=0;//正误控制变量初始化
+      function zhengwu(tianxie)
+      {
+        zw=0;//函数每次运行前初始化，这样第二次做题才有意义
+        for (i=0;i<4;i++)
+        { 
+          for (j=0;j<4;j++)
+          {
+            if (tianxie[i][j]!=shuzu[i][j])
+            {   
+              zw=1; //若有不同正误控制变量赋值为1
+
+            }
+          } 
+        }
+      }
+
+      //5.3答题者填入答案初始化
+        var tianxie = new Array();
+        tianxie[0] = new Array();
+        tianxie[0]=[0,0,0,0];
+        tianxie[1] = new Array();
+        tianxie[1]=[0,0,0,0];
+        tianxie[2] = new Array();
+        tianxie[2]=[0,0,0,0];
+        tianxie[3] = new Array();
+        tianxie[3]=[0,0,0,0];
+
+      //5.4答题者填入答案填入
+            function yiqi()
+            {
+              for (i=0;i<4;i++)
+              { 
+                for (j=0;j<4;j++)
+                {
+                var zhanshiid=hcid(i, j);
+                tianxie[i][j]=ds(zhanshiid);
+                }
+              }
+            } 
+      //5.5第五部分函数整体激活函数
+            function panduan(){
+              yiqi();
+              zhengwu(tianxie);
+              if(zw==1)
+              {
+                alert("填错了");
+              }
+              else
+              {
+                alert("恭喜全对");
+              }
+            }
+
+
+      //6.文本框输入控制函数(由于知识有限实现控制输入的方式比较低级)
+      function kongzi(idcode)
+      {
+        //获取该id对应的object
+        var temp=document.getElementById(idcode);//id的i大写
+        //不准输入数字以外的数
+        temp.value=temp.value.replace(/[^\d]/g,'');//js正则语法:/正则表达式主体/修饰符(可选)
+
+        //输入数字控制
+        a=parseInt(temp.value);
+        //不准输入0
+        if(a==0){
+        temp.value = '';
+        }
+        //只能输入一位数，且后输的数会取代前输的数        
+        if(a>9){
+        temp.value = a%10;
+        }
+      }
+      //不使用object.onkeyup，100X100更简单，但在9宫格比较麻烦
+
+  //7.答案显示函数（点击按钮后答案出现在文本框内）
+    function daan()
+    {
+
+        for (i=0;i<4;i++)
+        { 
+          for (j=0;j<4;j++)
+          {                       
+              var str=hcid(i,j);
+              document.getElementById(str).value=shuzu[i][j];            
+          } 
+        }      
+        alert("答案可能不唯一，这只是一种答案。");
+    }
+
+  //8.新的一题（同过页面刷新实现）
+    function xinti()
+    {
+      // alert("代码编写者：周宇森");
+      location.reload(true);
+    }
+
+
+</script>
+</head>
+
+<!--html代码-->
+<body>
+  <!--1.简单模式-->
+  <div class="divgs" id="sigongge">
+      <div style="text-align:center"><!--div居中-->
+        <p>4 X 4</p>
+        <p>规则：根据已给的数字，将所有空格填上数字，要求每行每列都要有1，2，3，4这4个数字</p>
+      </div>
+    <form name="form1" id="form2"  method="post"> 
+      <table border="1" class="tablegs"><!--使用表格达到理想的视觉效果，在表格中嵌套文本框以达到响应的效果-->
+        <!--onkeyup当用户释放键盘按钮时执行Javascript代码：-->
+        <!--第一行-->
+        <tr> 
+          <th><input type="text" name="txt02" id="txt00" class="wbk" onkeyup="kongzi('txt00')"></th>
+          <th><input type="text" name="txt01" id="txt01" class="wbk" onkeyup="kongzi('txt01')"></th>
+          <th><input type="text" name="txt02" id="txt02" class="wbk" onkeyup="kongzi('txt02')"></th>
+          <th><input type="text" name="txt03" id="txt03" class="wbk" onkeyup="kongzi('txt03')"></th>
+        </tr>
+        <!--第二行--> 
+        <tr>
+          <th><input type="text" name="txt10" id="txt10" class="wbk" onkeyup="kongzi('txt10')"></th>
+          <th><input type="text" name="txt11" id="txt11" class="wbk" onkeyup="kongzi('txt11')"></th>
+          <th><input type="text" name="txt13" id="txt12" class="wbk" onkeyup="kongzi('txt12')"></th>
+          <th><input type="text" name="txt13" id="txt13" class="wbk" onkeyup="kongzi('txt13')"></th>
+        </tr>
+        <!--第三行-->
+        <tr>
+          <th><input type="text" name="txt20" id="txt20" class="wbk"  onkeyup="kongzi('txt20')"></th>
+          <th><input type="text" name="txt22" id="txt21" class="wbk"  onkeyup="kongzi('txt21')"></th>
+          <th><input type="text" name="txt22" id="txt22" class="wbk"  onkeyup="kongzi('txt22')"></th>
+          <th><input type="text" name="txt23" id="txt23" class="wbk"  onkeyup="kongzi('txt23')"></th>
+        </tr>
+        <!--第四行-->
+        <tr>
+          <th><input type="text" name="txt30" id="txt30" class="wbk"  onkeyup="kongzi('txt30')"></th>
+          <th><input type="text" name="txt31" id="txt31" class="wbk"  onkeyup="kongzi('txt31')"></th>
+          <th><input type="text" name="txt32" id="txt32" class="wbk"  onkeyup="kongzi('txt32')"></th>
+          <th><input type="text" name="txt32" id="txt33" class="wbk"  onkeyup="kongzi('txt33')"></th>
+        </tr>
+      </table>      
+      <div style="text-align:center"><!--div居中-->
+        <input type="button" style="width:200px;height:50px" value="点击提交" onclick="panduan()" class="angs" ><!--绝对位置虽然会方便，但是手机上会出错-->
+      </div>
+      <div style="text-align:center">
+        <input type="button" style="width:200px;height:50px" value="显示答案" onclick="daan()" class="angs" >
+      </div>
+      <div style="text-align:center">
+        <input type="button" style="width:200px;height:50px" value="新的一题" onclick="xinti()" class="angs" >
+      </div>
+    </form>
+  </div>    
+</body>
+</html>
+
+<!--
+易错点
+1.双引号里面就只能用单引号
+2.
+3.for循环用的变量小心，连续两个for循环，或者for循环中嵌套了包含for循环的函数，就不能都用i了，要用i，j，k
+-->

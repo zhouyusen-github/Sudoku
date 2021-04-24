@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<title>Sudoku</title>
+
+<style type="text/css">
+/*1.格式，使用类选择器（对应class）*/
+/*1.1文本框格式*/
+.wbk{
+    width:50px; 
+    height:50px;
+    text-align:center;/*格式是把style="width:50px; height:50px;text-align:center"内的东西移出来*/
+}
+/*1.2div格式*/
+.divgs{
+    width:500px; 
+    height:600px;
+    background-color: rgba(0,0,0,0.1);/*前三位表示颜色，最后一位表示透明度*/
+    margin:0 auto;/*设置margin，第一个参数表示顶部的距离为0，而第二个auto表示的是自动,即自动根据网页来居中。*/   
+}
+/*1.3table格式*/
+.tablegs{
+    width:200px; 
+    height:200px;
+    background-color: rgba(0,255,0,0.1);/*前三位表示颜色，最后一位表示透明度*/
+    margin:0 auto;/*设置margin，第一个参数表示顶部的距离为0，而第二个auto表示的是自动,即自动根据网页来居中。*/   
+}
+/*1.4按钮格式*/
+.angs{
+    width:100px; 
+    height:50px;
+    background-color: rgba(0,0,255,0.1);/*前三位表示颜色，最后一位表示透明度*/
+    margin:220 auto;/*设置margin，第一个参数表示顶部的距离为0，而第二个auto表示的是自动,即自动根据网页来居中。*/   
+}
+
+/*1.4表格一个的格式*/
+.xgs{
+    background-color: rgba(255,0,0,0.1);/*前三位表示颜色，最后一位表示透明度*/
+}
+
+/*2.属性选择器*/
+/*用name为属性*/
+input[name="c1"]
+{
+    background-color: rgba(255,255,51,1);;
+}
+</style>
+
+<!--js代码-->
+<script language="javascript">
+
+
+//1.弄乱数组函数
+  //1.1随机数生成：生成0-2范围内的整数
+    function suiji2(){
+      var a=0;
+      a=parseInt(Math.random()*10000);
+      var b=0;
+      b=a%3;
+      return b;
+    }
+
+  //1.2小九宫格内纵向打乱:横向9个不动，纵向0-2，3-5，6-8内部序号互换
+    function zongmix2(shuzu2,x){//x负责调控0-2，3-5，6-8，第一个九宫格x为0，第二个x为3，第三个x为6，横向的y同理
+      var sj=0;
+      sj=suiji2();
+      var zhongzhuan=new Array();
+      zhongzhuan=shuzu2[sj+x];
+      shuzu2[sj+x]=shuzu2[((sj+1)%3)+x];
+      shuzu2[((sj+1)%3)+x]=zhongzhuan;
+    }
+    function quanzongmix2(shuzu2){
+      zongmix2(shuzu2,0);
+      zongmix2(shuzu2,3);
+      zongmix2(shuzu2,6);
+    }
+
+
+  //1.3九大格纵向打乱：横向9个不动，0-2与3-5与6-8，3行为单位互换
+      function dazongmix2(shuzu2){
+      var sj=0;
+      sj=suiji2();
+
+      var dagesj=(sj*3);//大格之间行距为3,dagesui的值为0，3，6
+      var zhongzhuan=new Array();;
+      for (i=0;i<3;i++){
+      zhongzhuan=shuzu2[dagesj+i];
+      shuzu2[dagesj+i]=shuzu2[(dagesj+3+i)%9];
+      shuzu2[(dagesj+3+i)%9]=zhongzhuan;
+      }
+    }
+
+
+  //1.4小九宫格内横向打乱：纵向9个不动，横向0-2，3-5，6-8内部序号互换
+    function hengmix2(shuzu2,y)
+    {
+      var sj=0;
+      sj=suiji2();
+      var zz=0;
+      for (i=0;i<9;i++)
+      {     
+        zz=shuzu2[i][sj+y];
+        shuzu2[i][sj+y]=shuzu2[i][((sj+1)%3)+y];
+        shuzu2[i][((sj+1)%3)+y]=zz;
+      }
+    }
+    function quanhengmix2(shuzu2){
+      hengmix2(shuzu2,0);
+      zongmix2(shuzu2,3);
+      zongmix2(shuzu2,6);
+    }
+
+
+  //1.5九大格横向打乱
+    function dahengmix2(shuzu2)
+    {
+      var sj=0;
+      sj=suiji2();
+      var dagesj=(sj*3);//大格之间行距为3,dagesui的值为0，3，6
+      var zz=0;
+      for (j=0;j<3;j++)
+      {
+        for (i=0;i<9;i++)
+        {     
+        zz=shuzu2[i][dagesj+j];
+        shuzu2[i][dagesj+j]=shuzu2[i][(dagesj+3+j)%9];
+        shuzu2[i][(dagesj+3+j)%9]=zz;
+        }
+      }
+    }
+
+
+
+
+  //1.5多次打乱
+    function hunhe2(shuzu2)
+    {
+      for (k=0;k<15;k++)//这里不能用i
+      {
+        quanzongmix2(shuzu2);
+        dazongmix2(shuzu2);
+        quanhengmix2(shuzu2);
+        dahengmix2(shuzu2);
+      }
+    }
+//2.答案数组生成
+  //2.1生成数独表原型数组
+    var shuzu2 = new Array();
+    shuzu2[0] = new Array();
+    shuzu2[0]=[1,2,3,4,5,6,7,8,9];
+    shuzu2[1] = new Array();
+    shuzu2[1]=[4,5,6,7,8,9,1,2,3];
+    shuzu2[2] = new Array();
+    shuzu2[2]=[7,8,9,1,2,3,4,5,6];
+    shuzu2[3] = new Array();
+    shuzu2[3]=[2,3,1,5,6,4,8,9,7];
+    shuzu2[4] = new Array();
+    shuzu2[4]=[5,6,4,8,9,7,2,3,1];
+    shuzu2[5] = new Array();
+    shuzu2[5]=[8,9,7,2,3,1,5,6,4];
+    shuzu2[6] = new Array();
+    shuzu2[6]=[3,1,2,6,4,5,9,7,8];
+    shuzu2[7] = new Array();
+    shuzu2[7]=[6,4,5,9,7,8,3,1,2];
+    shuzu2[8] = new Array();
+    shuzu2[8]=[9,7,8,3,1,2,6,4,5];
+
+  //2.2原型数组打乱生成答案数组
+    hunhe2(shuzu2);
+
+
+//3.显示控制xk2数组（用于控制哪些位置显示已知数）
+  //3.1生成原型控制数组（数字1的多少即可调节难度）
+    var xk2 = new Array();
+    xk2[0] = new Array();
+    xk2[0]=[1,0,0,1,0,1,0,1,0];
+    xk2[1] = new Array();
+    xk2[1]=[0,0,1,0,1,0,1,0,0];
+    xk2[2] = new Array();
+    xk2[2]=[0,1,0,0,0,0,0,0,1];
+    xk2[3] = new Array();
+    xk2[3]=[1,0,0,1,1,0,0,0,1];
+    xk2[4] = new Array();
+    xk2[4]=[0,1,1,1,0,0,1,0,0];
+    xk2[5] = new Array();
+    xk2[5]=[1,0,0,1,0,0,0,1,1];
+    xk2[6] = new Array();
+    xk2[6]=[0,0,1,0,1,1,0,1,0];
+    xk2[7] = new Array();
+    xk2[7]=[1,1,1,0,0,1,0,1,0];
+    xk2[8] = new Array();
+    xk2[8]=[1,0,0,1,0,0,1,0,0];
+  //3.2打乱生成实际控制数组
+    hunhe2(xk2);
+
+
+
+
+//4.显示xs2在网页中的已知数导入（原理：控制数组为1的点对应答案数组点的数据显示出来）
+  //4.1合成id号（字符串拼接函数）
+    function hcid2(x, y) {
+      var idhao2="txtnine"+x+y;
+
+      return idhao2;
+    }
+
+  //4.2已知数导入以及对应文本框只读锁定
+    function xs2()
+    {
+      window.onload=function()//onload可以使得js可以在网页打开时就将表格内含的值改变
+      {
+        for (i=0;i<9;i++)
+        { 
+          for (j=0;j<9;j++)
+
+          {
+            if (xk2[i][j]==1)
+            {                
+              var str=hcid2(i,j);
+              document.getElementById(str).value=shuzu2[i][j];
+              document.getElementById(str).readOnly = true;//readOnly为true则这个文本框只读
+            }
+          } 
+        }      
+      };
+    }
+    xs2();
+
+//5.提取数字正确判断分析（暂时先使用与标准答案是否相同的算法，因为数组小，到时候正式九宫格可能要用，数字不重复且范围内，且相加和为45）
+      //5.1文本框填入数字提取函数
+
+            function ds2(shuzi){  
+                   //第一种方法  
+                   var temp=document.getElementById(shuzi).value;   //注意引号内的内容应该是文本框的id而不能是name  
+                   return temp;  
+                }
+      //5.2与正确答案比较函数
+      var zw2=0;//正误控制变量初始化
+      function zhengwu2(tianxie2)
+      {
+        zw2=0;//函数每次运行前初始化，这样第二次做题才有意义
+        for (i=0;i<9;i++)
+        { 
+          for (j=0;j<9;j++)
+          {
+            if (tianxie2[i][j]!=shuzu2[i][j])
+            {   
+              zw2=1; //若有不同正误控制变量赋值为1
+
+            }
+          } 
+        }
+      }
+
+      //5.3答题者填入答案初始化
+        var tianxie2 = new Array();
+
+      for (i=0;i<9;i++)
+      {
+        tianxie2[i] = new Array(9);
+      }
+
+        
+
+      //5.4答题者填入答案填入
+            function yiqi2()
+            {
+              for (i=0;i<9;i++)
+              { 
+                for (j=0;j<9;j++)
+                {
+                var zhanshiid2=hcid2(i, j);
+                tianxie2[i][j]=ds2(zhanshiid2);
+                }
+              }
+            } 
+      //5.5第五部分函数整体激活函数
+            function panduan2(){
+              yiqi2();
+
+              zhengwu2(tianxie2);
+              if(zw2==1)
+              {
+                alert("Wrong Answer");
+              }
+              else
+              {
+                alert("Right Answer");
+              }
+            }
+
+
+      //6.文本框输入控制函数(由于知识有限实现控制输入的方式比较低级)
+      function kongzi2(idcode)
+      {
+        //获取该id对应的object
+        var temp=document.getElementById(idcode);//id的i大写
+        //不准输入数字以外的数
+        temp.value=temp.value.replace(/[^\d]/g,'');//js正则语法:/正则表达式主体/修饰符(可选)
+
+        //输入数字控制
+        a=parseInt(temp.value);
+        //不准输入0
+        if(a==0){
+        temp.value = '';
+        }
+        //只能输入一位数，且后输的数会取代前输的数        
+        if(a>9){
+        temp.value = a%10;
+        }
+      }
+      //不使用object.onkeyup，100X100更简单，但在9宫格比较麻烦
+
+  //7.答案显示函数（点击按钮后答案出现在文本框内）
+    function daan2()
+    {
+
+        for (i=0;i<9;i++)
+        { 
+          for (j=0;j<9;j++)
+          {                       
+              var str=hcid2(i,j);
+              document.getElementById(str).value=shuzu2[i][j];            
+          } 
+        }      
+      alert("The answer is just one possible answer.");
+    }
+
+  //8.新的一题（同过页面刷新实现）
+    function xinti2()
+    {
+      // alert("Writer: Zhou Yusen");
+      location.reload(true);
+    }
+
+
+</script>
+</head>
+
+<!--html代码-->
+<body>
+  <!--1.困难模式-->
+  <div class="divgs" id="sigongge">
+      <div style="text-align:center"><!--div居中-->
+        <p>9 X 9</p>
+        <p>Rule: According to the given number, fill in all the blanks with numbers. Each row and column should have 1 to 9.</p>
+      </div>
+    <form name="form1" id="form2"  method="post"> 
+      <table border="1" class="tablegs"><!--使用表格达到理想的视觉效果，在表格中嵌套文本框以达到响应的效果-->
+        <!--onkeyup当用户释放键盘按钮时执行Javascript代码：-->
+        <!--table对象可以动态创建，但是我暂时对代码实现不太懂-->
+        <!--第一行-->
+        <tr> 
+          <th><input type="text" name="c1" id="txtnine00" class="wbk" onkeyup="kongzi2('txtnine00')"></th>
+          <th><input type="text" name="c1" id="txtnine01" class="wbk" onkeyup="kongzi2('txtnine01')"></th>
+          <th><input type="text" name="c1" id="txtnine02" class="wbk" onkeyup="kongzi2('txtnine02')"></th>
+          <th><input type="text" id="txtnine03" class="wbk" onkeyup="kongzi2('txtnine03')"></th>
+          <th><input type="text" id="txtnine04" class="wbk" onkeyup="kongzi2('txtnine04')"></th>
+          <th><input type="text" id="txtnine05" class="wbk" onkeyup="kongzi2('txtnine05')"></th>
+          <th><input type="text" name="c1" id="txtnine06" class="wbk" onkeyup="kongzi2('txtnine06')"></th>
+          <th><input type="text" name="c1" id="txtnine07" class="wbk" onkeyup="kongzi2('txtnine07')"></th>
+          <th><input type="text" name="c1" id="txtnine08" class="wbk" onkeyup="kongzi2('txtnine08')"></th>
+        </tr>
+        <!--第二行--> 
+        <tr>
+          <th><input type="text" name="c1" id="txtnine10" class="wbk" onkeyup="kongzi2('txtnine10')"></th>
+          <th><input type="text" name="c1" id="txtnine11" class="wbk" onkeyup="kongzi2('txtnine11')"></th>
+          <th><input type="text" name="c1" id="txtnine12" class="wbk" onkeyup="kongzi2('txtnine12')"></th>
+          <th><input type="text" id="txtnine13" class="wbk" onkeyup="kongzi2('txtnine13')"></th>
+          <th><input type="text" id="txtnine14" class="wbk" onkeyup="kongzi2('txtnine14')"></th>
+          <th><input type="text" id="txtnine15" class="wbk" onkeyup="kongzi2('txtnine15')"></th>
+          <th><input type="text" name="c1" name="c1" id="txtnine16" class="wbk" onkeyup="kongzi2('txtnine16')"></th>
+          <th><input type="text" name="c1" id="txtnine17" class="wbk" onkeyup="kongzi2('txtnine17')"></th>
+          <th><input type="text" name="c1" id="txtnine18" class="wbk" onkeyup="kongzi2('txtnine18')"></th>
+        </tr>
+        <!--第三行-->
+        <tr>
+          <th><input type="text" name="c1" id="txtnine20" class="wbk" onkeyup="kongzi2('txtnine20')"></th>
+          <th><input type="text" name="c1" id="txtnine21" class="wbk" onkeyup="kongzi2('txtnine21')"></th>
+          <th><input type="text" name="c1" id="txtnine22" class="wbk" onkeyup="kongzi2('txtnine22')"></th>
+          <th><input type="text" id="txtnine23" class="wbk" onkeyup="kongzi2('txtnine23')"></th>
+          <th><input type="text" id="txtnine24" class="wbk" onkeyup="kongzi2('txtnine24')"></th>
+          <th><input type="text" id="txtnine25" class="wbk" onkeyup="kongzi2('txtnine25')"></th>
+          <th><input type="text" name="c1" id="txtnine26" class="wbk" onkeyup="kongzi2('txtnine26')"></th>
+          <th><input type="text" name="c1" id="txtnine27" class="wbk" onkeyup="kongzi2('txtnine27')"></th>
+          <th><input type="text" name="c1" id="txtnine28" class="wbk" onkeyup="kongzi2('txtnine28')"></th>
+        </tr>
+        <!--第四行-->
+        <tr>
+          <th><input type="text" id="txtnine30" class="wbk" onkeyup="kongzi2('txtnine30')"></th>
+          <th><input type="text" id="txtnine31" class="wbk" onkeyup="kongzi2('txtnine31')"></th>
+          <th><input type="text" id="txtnine32" class="wbk" onkeyup="kongzi2('txtnine32')"></th>
+          <th><input type="text" name="c1" id="txtnine33" class="wbk" onkeyup="kongzi2('txtnine33')"></th>
+          <th><input type="text" name="c1" id="txtnine34" class="wbk" onkeyup="kongzi2('txtnine34')"></th>
+          <th><input type="text" name="c1" id="txtnine35" class="wbk" onkeyup="kongzi2('txtnine35')"></th>
+          <th><input type="text" id="txtnine36" class="wbk" onkeyup="kongzi2('txtnine36')"></th>
+          <th><input type="text" id="txtnine37" class="wbk" onkeyup="kongzi2('txtnine37')"></th>
+          <th><input type="text" id="txtnine38" class="wbk" onkeyup="kongzi2('txtnine38')"></th>
+        </tr>
+        <!--第五行-->
+        <tr>
+          <th><input type="text" id="txtnine40" class="wbk" onkeyup="kongzi2('txtnine40')"></th>
+          <th><input type="text" id="txtnine41" class="wbk" onkeyup="kongzi2('txtnine41')"></th>
+          <th><input type="text" id="txtnine42" class="wbk" onkeyup="kongzi2('txtnine42')"></th>
+          <th><input type="text" name="c1" id="txtnine43" class="wbk" onkeyup="kongzi2('txtnine43')"></th>
+          <th><input type="text" name="c1" id="txtnine44" class="wbk" onkeyup="kongzi2('txtnine44')"></th>
+          <th><input type="text" name="c1" id="txtnine45" class="wbk" onkeyup="kongzi2('txtnine45')"></th>
+          <th><input type="text" id="txtnine46" class="wbk" onkeyup="kongzi2('txtnine46')"></th>
+          <th><input type="text" id="txtnine47" class="wbk" onkeyup="kongzi2('txtnine47')"></th>
+          <th><input type="text" id="txtnine48" class="wbk" onkeyup="kongzi2('txtnine48')"></th>
+        </tr>
+        <!--第六行-->
+        <tr>
+          <th><input type="text" id="txtnine50" class="wbk" onkeyup="kongzi2('txtnine50')"></th>
+          <th><input type="text" id="txtnine51" class="wbk" onkeyup="kongzi2('txtnine51')"></th>
+          <th><input type="text" id="txtnine52" class="wbk" onkeyup="kongzi2('txtnine52')"></th>
+          <th><input type="text" name="c1" id="txtnine53" class="wbk" onkeyup="kongzi2('txtnine53')"></th>
+          <th><input type="text" name="c1" id="txtnine54" class="wbk" onkeyup="kongzi2('txtnine54')"></th>
+          <th><input type="text" name="c1" id="txtnine55" class="wbk" onkeyup="kongzi2('txtnine55')"></th>
+          <th><input type="text" id="txtnine56" class="wbk" onkeyup="kongzi2('txtnine56')"></th>
+          <th><input type="text" id="txtnine57" class="wbk" onkeyup="kongzi2('txtnine57')"></th>
+          <th><input type="text" id="txtnine58" class="wbk" onkeyup="kongzi2('txtnine58')"></th>
+        </tr>
+        <!--第七行-->
+        <tr>
+          <th><input type="text" name="c1" id="txtnine60" class="wbk" onkeyup="kongzi2('txtnine60')"></th>
+          <th><input type="text" name="c1" id="txtnine61" class="wbk" onkeyup="kongzi2('txtnine61')"></th>
+          <th><input type="text" name="c1" id="txtnine62" class="wbk" onkeyup="kongzi2('txtnine62')"></th>
+          <th><input type="text" id="txtnine63" class="wbk" onkeyup="kongzi2('txtnine63')"></th>
+          <th><input type="text" id="txtnine64" class="wbk" onkeyup="kongzi2('txtnine64')"></th>
+          <th><input type="text" id="txtnine65" class="wbk" onkeyup="kongzi2('txtnine65')"></th>
+          <th><input type="text" name="c1" id="txtnine66" class="wbk" onkeyup="kongzi2('txtnine66')"></th>
+          <th><input type="text" name="c1" id="txtnine67" class="wbk" onkeyup="kongzi2('txtnine67')"></th>
+          <th><input type="text" name="c1" id="txtnine68" class="wbk" onkeyup="kongzi2('txtnine68')"></th>
+        </tr>
+        <!--第八行-->
+        <tr>
+          <th><input type="text" name="c1" id="txtnine70" class="wbk" onkeyup="kongzi2('txtnine70')"></th>
+          <th><input type="text" name="c1" id="txtnine71" class="wbk" onkeyup="kongzi2('txtnine71')"></th>
+          <th><input type="text" name="c1" id="txtnine72" class="wbk" onkeyup="kongzi2('txtnine72')"></th>
+          <th><input type="text" id="txtnine73" class="wbk" onkeyup="kongzi2('txtnine73')"></th>
+          <th><input type="text" id="txtnine74" class="wbk" onkeyup="kongzi2('txtnine74')"></th>
+          <th><input type="text" id="txtnine75" class="wbk" onkeyup="kongzi2('txtnine75')"></th>
+          <th><input type="text" name="c1" id="txtnine76" class="wbk" onkeyup="kongzi2('txtnine76')"></th>
+          <th><input type="text" name="c1" id="txtnine77" class="wbk" onkeyup="kongzi2('txtnine77')"></th>
+          <th><input type="text" name="c1" id="txtnine78" class="wbk" onkeyup="kongzi2('txtnine78')"></th>
+        </tr>
+        <!--第九行-->
+        <tr>
+          <th><input type="text" name="c1" id="txtnine80" class="wbk" onkeyup="kongzi2('txtnine80')"></th>
+          <th><input type="text" name="c1" id="txtnine81" class="wbk" onkeyup="kongzi2('txtnine81')"></th>
+          <th><input type="text" name="c1" id="txtnine82" class="wbk" onkeyup="kongzi2('txtnine82')"></th>
+          <th><input type="text" id="txtnine83" class="wbk" onkeyup="kongzi2('txtnine83')"></th>
+          <th><input type="text" id="txtnine84" class="wbk" onkeyup="kongzi2('txtnine84')"></th>
+          <th><input type="text" id="txtnine85" class="wbk" onkeyup="kongzi2('txtnine85')"></th>
+          <th><input type="text" name="c1" id="txtnine86" class="wbk" onkeyup="kongzi2('txtnine86')"></th>
+          <th><input type="text" name="c1" id="txtnine87" class="wbk" onkeyup="kongzi2('txtnine87')"></th>
+          <th><input type="text" name="c1" id="txtnine88" class="wbk" onkeyup="kongzi2('txtnine88')"></th>
+        </tr>
+      </table>      
+      <div style="text-align:center"><!--div居中-->
+        <input type="button" style="width:200px;height:50px" value="Submit" onclick="panduan2()" class="angs" ><!--绝对位置虽然会方便，但是手机上会出错-->
+      </div>
+      <div style="text-align:center">
+        <input type="button" style="width:200px;height:50px" value="Answer" onclick="daan2()" class="angs" >
+      </div>
+      <div style="text-align:center">
+        <input type="button" style="width:200px;height:50px" value="New Question" onclick="xinti2()" class="angs" >
+      </div>
+    </form>
+  </div>    
+</body>
+</html>
+
+<!--
+易错点
+1.双引号里面就只能用单引号
+2.
+3.for循环用的变量小心，连续两个for循环，或者for循环中嵌套了包含for循环的函数，就不能都用i了，要用i，j，k
+-->
